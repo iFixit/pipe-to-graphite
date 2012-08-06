@@ -20,5 +20,5 @@ awk "$awk_command" |
 tr '[A-Z]' '[a-z]' |
 # Prepend 'mysql.' and turn a few instances of 'name_' into 'name.' mainly
 # so they are grouped in the Graphite UI
-sed -e "s/^/mysql./" -re "s/^(com|handler|innodb|key|qcache|select|sort|threads)_/\1./"
+sed -re "s/^(com|handler|innodb|key|qcache|select|sort|threads)_/\1./" -e "s/^/mysql./"
 
