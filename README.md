@@ -26,7 +26,6 @@ a script `/usr/glork/status` that spits out something like this:
     Blargs: 1230
     Blorks: 452
    
-
 You only care about the Blargs and Blorks (those are counts since
 program start).  All you have to do is write a script that does some grepping
 and awking to get that into this:
@@ -34,13 +33,14 @@ and awking to get that into this:
     Blargs 1230
     Blorks 452
 
-Your script (lets say `~/glork-stata.sh`) would look something like this:
+Your script (lets say `~/glork-stats.sh`) would look something like this:
+
     /usr/glork/status | tail -n +3 | sed "s/: / /"
 
-To get that regularly reported to Graphite, run tthis command
+To get that regularly reported to Graphite, run this command
 
    pipe-to-graphite.sh ~/glork-stats.sh >> /var/log/glork-stats.log
 
 ### Logging
-Output from each run is prepended with a timestamp and echoed to STDOUT
+Output from each run is prepended with a timestamp and echoed to stdout
 Redirect that wherever you like.
