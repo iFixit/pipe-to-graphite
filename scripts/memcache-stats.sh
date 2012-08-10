@@ -1,7 +1,9 @@
 #!/bin/bash
-# Echo all the useful information from the `service memcached status` command 
-#
-# Output wil resemble this:
+argument="$1"
+# Echo all the useful information from the `stats` memcache
+# telnet command 
+# 
+# Output will resemble this:
 #
 #    memcache.pid 17576
 #    memcache.uptime 1080764
@@ -12,11 +14,25 @@
 #    memcache.curr_items 181059
 #    memcache.total_items 1948898
 #    memcache.bytes 62620267
-#    ...
-
-# memcache gives us some decent stats in the form of 
-# STAT bytes_read 4535820
-service memcached status 2>/dev/null |
+#
+# Output will include this if argument=='extended' (for each slab):
+#
+#    memcache.slabs.5.chunk_size 280
+#    memcache.slabs.5.chunks_per_page 3744
+#    memcache.slabs.5.total_pages 3
+#    memcache.slabs.5.total_chunks 11232
+#    memcache.slabs.5.used_chunks 11226
+#    memcache.slabs.5.free_chunks 6
+#    memcache.slabs.5.free_chunks_end 1849
+# 
+(
+    sleep 1
+    [ "$argument" == "extended" ] && echo "stats slabs" && echo "stats items"
+    echo "stats"
+    sleep 1
+    echo "quit"
+) | telnet localhost 11211 2>/dev/null |
 grep STAT |
 grep -v version |
-sed "s/STAT /memcache\./" 
+sed -re 's/STAT (items:)?([0-9]+):/memcache.slabs.\2./' \
+     -e 's/STAT /memcache./'
