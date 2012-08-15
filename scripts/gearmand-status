@@ -1,0 +1,15 @@
+#!/bin/sh
+#
+# Transform gearman status info:
+#     WorkerFunctionName 10 3 2
+#
+# Into this:
+#     gearman.WorkerFunctionName.queued 10
+#     gearman.WorkerFunctionName.running 3
+#     gearman.WorkerFunctionName.workers 2
+(echo status ; sleep 0.1) |
+nc 127.0.0.1 4730 |
+sed -e "s/::/_/" -e "/^\.$/d" -e "s/^/gearman./" |
+awk '{print $1 ".queued",$2;
+      print $1 ".running",$3;
+      print $1 ".workers",$4}'
