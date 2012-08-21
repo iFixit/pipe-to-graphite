@@ -7,8 +7,8 @@
 #     gearman.WorkerFunctionName.queued 10
 #     gearman.WorkerFunctionName.running 3
 #     gearman.WorkerFunctionName.workers 2
-(echo status ; sleep 0.1) |
-nc 127.0.0.1 4730 |
+(echo status; sleep 1) |
+nc -w 1 127.0.0.1 4730 |
 sed -e "s/::/_/" -e "/^\.$/d" -e "s/^/gearman./" |
 awk '{print $1 ".queued",$2;
       print $1 ".running",$3;
