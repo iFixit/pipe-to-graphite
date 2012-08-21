@@ -10,10 +10,14 @@
 # Origin: git@gist.github.com:3271040.git
 ##
 
-# edit these to match your graphite setup
+# Defaults
 GRAPHITE_SERVER=localhost
 GRAPHITE_PORT=2003
 GRAPHITE_INTERVAL=10 # in seconds
+
+if [ -f graphite.conf ]; then
+   source graphite.conf
+fi;
 
 # Normal usage just passes the command as the only parameter
 # This checks if we're on a recursive call.
@@ -35,6 +39,11 @@ if [ "$1" != "report-to-graphite" ]; then
       echo "/command/to/run must:"
       echo " * echo 'name number' pairs separated by newlines"
       echo " * have an exit code of 0"
+      echo
+      echo "Edit ./graphite.conf and export the following shell variables:"
+      echo "GRAPHITE_SERVER"
+      echo "GRAPHITE_PORT"
+      echo "GRAPHITE_INTERVAL"
       ) >&2
       exit 1
 
