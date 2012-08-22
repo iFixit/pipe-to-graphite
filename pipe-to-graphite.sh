@@ -100,7 +100,7 @@ $output"
             # and then to the correct server and port using netcat
             echo "$output" |
              sed "s/\$/ $ts/" |
-             nc -w 1 -u $GRAPHITE_SERVER $GRAPHITE_PORT
+             nc -w 1 $GRAPHITE_SERVER $GRAPHITE_PORT
          fi
 
          # Echo this data too in case we want to record
