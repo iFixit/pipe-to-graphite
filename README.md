@@ -39,7 +39,12 @@ Your script (lets say `~/glork-stats.sh`) would look something like this:
 
 To get that regularly reported to Graphite, run this command
 
-   pipe-to-graphite.sh ~/glork-stats.sh >> /var/log/glork-stats.log
+   ./pipe-to-graphite.sh ~/glork-stats.sh >> /var/log/glork-stats.log
+
+Or to report it to graphite at any time, if you want to use cron or something.
+The '-' argument indicates input should be read form stdin
+
+   ~/glork-stats.sh | ./pipe-to-graphite.sh -
 
 ### Logging
 Output from each run is prepended with a timestamp and echoed to stdout
