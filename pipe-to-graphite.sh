@@ -20,9 +20,20 @@ if [ -f graphite.conf ]; then
    source graphite.conf
 fi
 
+# '-' indicates we should read from stdin
+if [ "$1" = "-" ]; then
+   # Get a timestamp for sending to graphite
+   ts=`date +%s`
+
+   # Pipe the output through sed, using a regex to
+   # append a $ts timestamp to the end of each line,
+   # and then to the correct server and port using netcat
+   sed -e '/ [0-9]\+$/!d' -e "s/\$/ $ts/" |
+   nc -w 1 $GRAPHITE_SERVER $GRAPHITE_PORT
+
 # Normal usage just passes the command as the only parameter
 # This checks if we're on a recursive call.
-if [ "$1" != "report-to-graphite" ]; then
+elif [ "$1" != "report-to-graphite" ]; then
    command="$1"
 
 	 # No point in attempting to run an empty command
@@ -41,6 +52,8 @@ if [ "$1" != "report-to-graphite" ]; then
       cat <<-EOF >&2
 				Usage:
 				  $(basename $0) '/command/to/run' >> /var/log/some-stats.log
+				Or (for use from cron or other automated invocations):
+				  /command/to/run | $(basename $0) -
 
 				/command/to/run must:
 				 * echo 'name number' pairs separated by newlines
