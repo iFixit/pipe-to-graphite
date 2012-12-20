@@ -52,6 +52,8 @@ elif [ "$1" != "report-to-graphite" ]; then
       cat <<-EOF >&2
 				Usage:
 				  $(basename $0) '/command/to/run' >> /var/log/some-stats.log
+				Or (for use from cron or other automated invocations):
+				  /command/to/run | $(basename $0) -
 
 				/command/to/run must:
 				 * echo 'name number' pairs separated by newlines
