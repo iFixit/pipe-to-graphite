@@ -10,14 +10,15 @@
 # Origin: git@gist.github.com:3271040.git
 ##
 
-# Defaults
-GRAPHITE_SERVER=localhost
-GRAPHITE_PORT=2003
-GRAPHITE_INTERVAL=10 # in seconds
+# Defaults can be specified via the existing shell command-line
+# or via the graphite.conf. The config file has precedence.
+GRAPHITE_SERVER=${GRAPHITE_SERVER:=localhost}
+GRAPHITE_PORT=${GRAPHITE_PORT:=2003}
+GRAPHITE_INTERVAL=${GRAPHITE_INTERVAL:=10} # in seconds
 
 if [ -f graphite.conf ]; then
    source graphite.conf
-fi;
+fi
 
 # '-' indicates we should read from stdin
 if [ "$1" = "-" ]; then
@@ -35,27 +36,32 @@ if [ "$1" = "-" ]; then
 elif [ "$1" != "report-to-graphite" ]; then
    command="$1"
 
-   echo -n "Running '$command' as a test.. " >&2
-   test_output=$($command 2>&1)
-   test_return=$?
+	 # No point in attempting to run an empty command
+	 if [ ! -z "$command" ]; then
+		 echo -n "Running '$command' as a test.. " >&2
+		 test_output=$($command 2>&1)
+		 test_return=$?
+		 if [ $test_return -ne 0 ]; then
+		     echo "FAILED" >&2
+	   fi
+	 fi
 
-   if [ "$test_output" == "" ] || [ "$test_return" != "0" ]; then
-      (
-      echo "FAILED"
-      echo
-      echo "Usage:"
-      script="`basename $0`"
-      echo "  $script '/command/to/run' >> /var/log/some-stats.log "
-      echo
-      echo "/command/to/run must:"
-      echo " * echo 'name number' pairs separated by newlines"
-      echo " * have an exit code of 0"
-      echo
-      echo "Edit ./graphite.conf and export the following shell variables:"
-      echo "GRAPHITE_SERVER"
-      echo "GRAPHITE_PORT"
-      echo "GRAPHITE_INTERVAL"
-      ) >&2
+   if [ -z "$test_output" ] || [ $test_return -ne 0 ]; then
+			# Use a bash here document. The <<- allows the preceding tabs
+			# to not actually be displayed when the here doc is printed out
+      cat <<-EOF >&2
+				Usage:
+				  $(basename $0) '/command/to/run' >> /var/log/some-stats.log
+
+				/command/to/run must:
+				 * echo 'name number' pairs separated by newlines
+				 * have an exit code of 0
+
+				Edit ./graphite.conf and export the following shell variables:
+				GRAPHITE_SERVER
+				GRAPHITE_PORT
+				GRAPHITE_INTERVAL
+				EOF
       exit 1
 
    else
@@ -67,19 +73,20 @@ elif [ "$1" != "report-to-graphite" ]; then
    # If we are connected to a terminal redirect stdout to /dev/null
    # so nohup doesn't complain and send it to nohup.out
    if [ -t 1 ] ; then
-      echo "Redirecting stdout to /dev/null so it doesn't mess up your" >&2
-      echo "terminal.  Redirect it somewhere else if you wan't to save it." >&2
-      echo >&2
+			cat <<-EOF >&2
+				Redirecting stdout to /dev/null so it doesn't mess up your
+				terminal.  Redirect it somewhere else if you wan't to save it.
+				EOF
       nohup $script 'report-to-graphite' "$command" >/dev/null &
    else
       nohup $script 'report-to-graphite' "$command" &
    fi
    pid=$!
-   (
-   echo "Command: $command"
-   echo "is being piped to graphite every $GRAPHITE_INTERVAL seconds"
-   echo "Background PID: $pid"
-   ) >&2
+	 cat <<-EOF >&2
+		Command: $command
+		is being piped to graphite every $GRAPHITE_INTERVAL seconds
+		Background PID: $pid
+		EOF
 
 # Internal usage passes the action as the first parameter
 # If we get here, we're running from the nohup command above
@@ -98,10 +105,10 @@ else
          # Run the provided command and capture stdout
          output=$($command)
          exit_status=$?
-         
+
          # If the command didn't succeed, prepend the output with a failure
          # message and don't send it to graphite.
-         if [ "$exit_status" != "0" ]; then
+         if [ $exit_status -ne 0 ]; then
             err="FAILED: exit code = $exit_status, not reported to graphite"
             output="$err
 $output"
@@ -122,6 +129,4 @@ $output"
       ) &
       sleep $GRAPHITE_INTERVAL
    done;
-fi 
-
-
+fi
