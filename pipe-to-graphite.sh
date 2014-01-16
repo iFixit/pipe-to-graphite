@@ -73,17 +73,22 @@ elif [ "$1" != "report-to-graphite" ]; then
 
    script="$0"
    # If we are connected to a terminal redirect stdout to /dev/null
-   # so nohup doesn't complain and send it to nohup.out
+   # so it doesn't end up outputting to our terminal
    if [ -t 1 ] ; then
 			cat <<-EOF >&2
 				Redirecting stdout to /dev/null so it doesn't mess up your
 				terminal.  Redirect it somewhere else if you wan't to save it.
 				EOF
-      nohup $script 'report-to-graphite' "$command" >/dev/null &
+      $script 'report-to-graphite' "$command" >/dev/null &
    else
-      nohup $script 'report-to-graphite' "$command" &
+      $script 'report-to-graphite' "$command" &
    fi
    pid=$!
+   # Completely disown the most recently launched backgrounded job so it's not
+   # in our process-tree. This prevents *wait* and friends from blocking on
+   # the background job.
+   disown
+
 	 cat <<-EOF >&2
 		Command: $command
 		is being piped to graphite every $GRAPHITE_INTERVAL seconds
