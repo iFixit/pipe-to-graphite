@@ -1,6 +1,8 @@
 #!/bin/bash
 
-cpu_line=$(top -b -n 1 | grep ^Cpu)
+# top in batch mode outputs life-time cpu usage on the first iteration, so we
+# use -n 2 and grab the last one.
+cpu_line=$(top -b -n 2 -i -H | grep ^Cpu | tail -n+2)
 hostname=$(hostname)
 
 extract() {
@@ -13,5 +15,6 @@ extract() {
 extract user us
 extract system sy
 extract wait wa
+extract idle id
 extract steal st
 
