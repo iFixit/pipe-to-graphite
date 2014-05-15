@@ -47,6 +47,8 @@ s.sendall("show stat\n")
 data = s.recv(2**13)
 s.close()
 
+# Include the hostname as *one* directory in the metric to distinguish machines.
+hostname = socket.gethostname().replace('.', '_')
 # We DictReader requires a file object as input.  I couldn't find a better way
 # of going from the socket bytestream to a file object than via a string.
 data = DictReader(StringIO(data))
@@ -77,5 +79,5 @@ for line in data:
          # We can't convert None or '' to 0 directly, so convert to booleans
          # first.
          value = int(bool(value))
-      print('%s.%s.%s %d' % (section, name, metric, value))
+      print('haproxy.%s.%s.%s.%s %d' % (hostname, section, name, metric, value))
 
