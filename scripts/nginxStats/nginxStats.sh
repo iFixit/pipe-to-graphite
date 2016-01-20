@@ -3,7 +3,7 @@
 CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 HOSTNAME=$( hostname | cut -d"." -f 1 )
 
-STATS=$( curl -s http://127.0.0.1:8081/nginx_status )
+STATS=$( curl -s http://127.0.0.1/nginx_status )
 
 # The current number of active client connections including Waiting connections.
 # The current number of active (accepted) connections from clients, which includes all connections with the status Idle / Waiting, Reading, and Writing.
