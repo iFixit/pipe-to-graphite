@@ -2,6 +2,8 @@
 
 This collector makes a curl request to 127.0.0.1/nginx_status, parses the output, and echoes out the metrics shown below.
 
+This script is meant to run every 60 seconds. Running at any other interval is of course possible, but you'll need to customize the script for the output to make sense.
+
 NOTE: You have to add the following config to nginx under a ```server``` directive before you can consume information from 127.0.0.1/nginx_status:
 
 ```
