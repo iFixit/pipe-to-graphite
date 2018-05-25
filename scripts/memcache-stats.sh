@@ -1,5 +1,9 @@
 #!/bin/bash
 argument="$1"
+
+IP_ADDR=$(hostname -I | sed 's/ /\n/g' | grep '10\.')
+CLEAN_IP_ADDR=$(echo "$IP_ADDR" | sed 's/\./-/g')
+
 # Echo all the useful information from the `stats` memcache
 # telnet command 
 # 
@@ -35,4 +39,4 @@ argument="$1"
 grep STAT |
 grep -v version |
 sed -re 's/STAT (items:)?([0-9]+):/memcache.slabs.\2./' \
-     -e 's/STAT /memcache./'
+     -e "s/STAT /memcache.$CLEAN_IP_ADDR./"
