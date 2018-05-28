@@ -1,7 +1,7 @@
 #!/bin/bash
 argument="$1"
 
-IP_ADDR=$(hostname -I | sed 's/ /\n/g' | grep '10\.')
+IP_ADDR=$(hostname -I | grep -oP "\b10(\.\d+){3}" )
 CLEAN_IP_ADDR=$( echo "$IP_ADDR" | tr '.' '-' )
 
 # Echo all the useful information from the `stats` memcache
