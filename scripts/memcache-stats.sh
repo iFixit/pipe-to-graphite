@@ -2,7 +2,7 @@
 argument="$1"
 
 IP_ADDR=$(hostname -I | sed 's/ /\n/g' | grep '10\.')
-CLEAN_IP_ADDR=$(echo "$IP_ADDR" | sed 's/\./-/g')
+CLEAN_IP_ADDR=$( echo "$IP_ADDR" | tr '.' '-' )
 
 # Echo all the useful information from the `stats` memcache
 # telnet command 
