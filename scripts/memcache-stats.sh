@@ -5,8 +5,8 @@ IP_ADDR=$(hostname -I | sed 's/ /\n/g' | grep '10\.')
 CLEAN_IP_ADDR=$( echo "$IP_ADDR" | tr '.' '-' )
 
 # Echo all the useful information from the `stats` memcache
-# telnet command 
-# 
+# telnet command
+#
 # Output will resemble this:
 #
 #    memcache.pid 17576
@@ -28,7 +28,7 @@ CLEAN_IP_ADDR=$( echo "$IP_ADDR" | tr '.' '-' )
 #    memcache.slabs.5.used_chunks 11226
 #    memcache.slabs.5.free_chunks 6
 #    memcache.slabs.5.free_chunks_end 1849
-# 
+#
 (
     sleep 1
     [ "$argument" == "extended" ] && echo "stats slabs" && echo "stats items"
