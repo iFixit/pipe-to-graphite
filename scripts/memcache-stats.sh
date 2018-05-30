@@ -1,8 +1,12 @@
 #!/bin/bash
 argument="$1"
+
+IP_ADDR=$(hostname -I | grep -oP "\b10(\.\d+){3}")
+CLEAN_IP_ADDR=$(echo "$IP_ADDR" | tr '.' '-')
+
 # Echo all the useful information from the `stats` memcache
-# telnet command 
-# 
+# telnet command
+#
 # Output will resemble this:
 #
 #    memcache.pid 17576
@@ -24,7 +28,7 @@ argument="$1"
 #    memcache.slabs.5.used_chunks 11226
 #    memcache.slabs.5.free_chunks 6
 #    memcache.slabs.5.free_chunks_end 1849
-# 
+#
 (
     sleep 1
     [ "$argument" == "extended" ] && echo "stats slabs" && echo "stats items"
@@ -35,4 +39,4 @@ argument="$1"
 grep STAT |
 grep -v version |
 sed -re 's/STAT (items:)?([0-9]+):/memcache.slabs.\2./' \
-     -e 's/STAT /memcache./'
+     -e "s/STAT /memcache.$CLEAN_IP_ADDR./"
