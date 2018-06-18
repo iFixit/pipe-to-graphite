@@ -31,12 +31,10 @@ CLEAN_IP_ADDR=$(echo "$IP_ADDR" | tr '.' '-')
 #
 (
     sleep 1
-    [ "$argument" == "extended" ] && echo "stats slabs" && echo "stats items"
     echo "stats"
     sleep 1
     echo "quit"
-) | telnet localhost 11211 2>/dev/null |
+) | telnet localhost 11222 2>/dev/null |
 grep STAT |
 grep -v version |
-sed -re 's/STAT (items:)?([0-9]+):/memcache.slabs.\2./' \
-     -e "s/STAT /memcache.$CLEAN_IP_ADDR./"
+sed -e "s/STAT /mcrouter.$CLEAN_IP_ADDR./"
